@@ -1,0 +1,27 @@
+-- Declaring the variables needed to store the current customer's info
+DECLARE @CurrentCustomer INT,
+	@CustomerName VARCHAR(60),
+	@CustomerAddress VARCHAR(40),
+	@CustomerVAT VARCHAR(12),
+	@CustomerSupplierCode DECIMAL(8,0),
+	@CustomerCommissionPrefix VARCHAR(40);
+
+-- Open cursor to iterate all the customers
+DECLARE c_Cursor_Customers CURSOR FOR SELECT CODICE_CLIENTE FROM dbo.Vpers_1CLIENTI WHERE A_COM IS NOT NULL;
+OPEN c_Cursor_Customers;
+
+-- Fetch each entry and perform operations
+FETCH c_Cursor_Customers INTO @CurrentCustomer;
+
+-- Iterating all the customers
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+	SELECT @CustomerName = RAGIONE_SOCIALE COLLATE Latin1_General_100_CI_AI_SC, @CustomerAddress = INDIRIZZO COLLATE Latin1_General_100_CI_AI_SC, @CustomerVAT = PIVA COLLATE Latin1_General_100_CI_AI_SC, @CustomerSupplierCode = CODICE_CLIENTE, @CustomerCommissionPrefix = A_COM COLLATE Latin1_General_100_CI_AI_SC FROM dbo.Vpers_1CLIENTI WHERE CODICE_CLIENTE=@CurrentCustomer;
+
+	FETCH NEXT FROM c_Cursor_Customers INTO @CurrentCustomer;
+
+END;
+
+CLOSE c_Cursor_Customers;
+DEALLOCATE c_Cursor_Customers;
